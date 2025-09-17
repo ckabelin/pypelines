@@ -21,7 +21,8 @@ jobs:
       - name: Build Docker image
         run: |
           IMAGE_TAG=${{ github.sha }}
-          docker build -t pypelines:${IMAGE_TAG} .
+          # build using the test1 subdirectory as context
+          docker build -t pypelines:${IMAGE_TAG} test1
           docker save pypelines:${IMAGE_TAG} -o image.tar
 
       - name: Upload image artifact

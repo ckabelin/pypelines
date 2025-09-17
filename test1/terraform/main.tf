@@ -12,6 +12,7 @@ provider "docker" {}
 resource "docker_image" "pypelines_image" {
   name         = "pypelines:latest"
   build {
+    # use repo root as context from terraform module
     context    = "${path.module}/.."
     dockerfile = "${path.module}/../Dockerfile"
   }

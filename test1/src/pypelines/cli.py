@@ -16,6 +16,9 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--host", default="0.0.0.0", help="Host to bind")
     run.add_argument("--port", type=int, default=8000, help="Port to bind")
     run.add_argument("--reload", action="store_true", help="Enable reload (dev)")
+    
+    test = sub.add_parser("test", help="Run test suite")
+    test.add_argument("-q", "--quiet", action="store_true", help="Run pytest quietly")
 
     return parser
 
@@ -44,6 +47,14 @@ def main(argv: List[str] | None = None) -> int:
         # Start uvicorn programmatically so behavior is predictable when installed
         uvicorn.run("pypelines.main:app", host=args.host, port=args.port, reload=args.reload)
         return 0
+
+    if args.cmd == "test":
+        # run pytest programmatically
+        import pytest
+        opts = []
+        if args.quiet:
+            opts.append("-q")
+        return pytest.main(opts)
 
     parser.print_help()
     return 1
