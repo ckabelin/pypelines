@@ -1,0 +1,101 @@
+name: Build and publish Docker image
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*', 'release-*' ]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-image:
+    name: Build image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          IMAGE_TAG=${{ github.sha }}
+          docker build -t pypelines:${IMAGE_TAG} .
+          docker save pypelines:${IMAGE_TAG} -o image.tar
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-tar
+          path: image.tar
+
+  publish:
+    name: Publish image (manual)
+    needs: build-image
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: image-tar
+
+      - name: Load Docker image
+        run: docker load -i image.tar
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag and push
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/pypelines
+        run: |
+          docker tag pypelines:${IMAGE_TAG} ${IMAGE_NAME}:${IMAGE_TAG}
+          docker push ${IMAGE_NAME}:${IMAGE_TAG}
+
+      - name: Publish summary
+        run: echo "Pushed image ghcr.io/${{ github.repository_owner }}/pypelines:${{ github.sha }}"
+
+  publish-on-tag:
+    name: Publish on tag
+    needs: build-image
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: image-tar
+
+      - name: Load Docker image
+        run: docker load -i image.tar
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag and push (tag)
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/pypelines
+          GIT_TAG: ${{ github.ref_name }}
+        run: |
+          docker tag pypelines:${IMAGE_TAG} ${IMAGE_NAME}:${GIT_TAG}
+          docker tag pypelines:${IMAGE_TAG} ${IMAGE_NAME}:latest
+          docker push ${IMAGE_NAME}:${GIT_TAG}
+          docker push ${IMAGE_NAME}:latest
+
+      - name: Publish summary
+        run: echo "Pushed image ghcr.io/${{ github.repository_owner }}/pypelines:${{ github.ref_name }} and :latest"

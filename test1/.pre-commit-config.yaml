@@ -1,0 +1,17 @@
+repos:
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.0.256
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.9.0
+    hooks:
+      - id: mypy
+        additional_dependencies: ["mypy==1.9"]
+        args: ["--ignore-missing-imports"]
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.4.1
+    hooks:
+      - id: prettier
+        files: "\.(md|pyproject\.toml|yaml|yml)$"
