@@ -19,9 +19,8 @@ uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME
 
 open VSCode under newly created subdirectory <PROJECT_NAME>.
 
-do your credential stuff
-
-git config --global credential.helper '!f() { sleep 1; echo "username=<USERNAME> token=github_pat_<TOKEN>>"; }; f'
+do your credential/ssh, git config stuff
+git remote set-url origin git@github.com:ckabelin/pypelines.git
 
 # get informed & watch cools stuff
 https://www.youtube.com/watch?v=a9eR1xsfvHg
