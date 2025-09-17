@@ -3,3 +3,13 @@ variable "image_name" {
   type        = string
   default     = "pypelines:latest"
 }
+
+variable "github_owner" {
+  description = "GitHub owner/org name for repository"
+  type        = string
+}
+
+variable "github_repo" {
+  description = "Repository name for setting branch protection (e.g. pypelines)"
+  type        = string
+}

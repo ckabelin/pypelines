@@ -1,0 +1,8 @@
+# Example terraform variables for pypelines terraform module
+# Copy this to terraform.tfvars and fill in the values before running `terraform apply`.
+
+github_owner = "ckabelin"
+github_repo  = "pypelines"
+
+# If you want to override the image name built by the docker resource:
+# image_name = "pypelines:latest"

@@ -1,0 +1,67 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ main, master ]
+  schedule:
+    - cron: '0 3 * * 0' # weekly on Sunday UTC
+
+jobs:
+  analyze:
+    name: Analyze (CodeQL)
+    runs-on: ubuntu-latest
+
+    permissions:
+      actions: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'python' ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Autobuild (pip install)
+        run: |
+          cd test1
+          python -m pip install --upgrade pip
+          pip install -e '.[dev]'
+
+      - name: Run CodeQL scan and export SARIF
+        uses: github/codeql-action/analyze@v2
+        with:
+          output: codeql-results.sarif
+
+      - name: Upload CodeQL SARIF
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: codeql-sarif
+          path: codeql-results.sarif
+
+      - name: Create issue if CodeQL findings
+        if: always() && steps.analyze.conclusion == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = `CodeQL found potential security issues. SARIF results are attached as an artifact. Please review the CodeQL alerts in the Security tab.`;
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'CodeQL security findings',
+              body,
+            });
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v2
