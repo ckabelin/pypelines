@@ -11,6 +11,7 @@ All notable changes made in this branch / session.
   - Added `ai` optional dependencies (Streamlit, LangChain, Ollama client, sentence-transformers, chromadb, tiktoken).
   - Added `[tool.ruff]` and `[tool.pydocstyle]` config.
 - `CONSTITUTION.md` updated to reflect the current project layout, CLI, AI features, and lint/typecheck config.
+  - Renamed `constitution.md` to `CONSTITUTION.md` to make the file name authoritative and consistent across platforms.
 - `README.md` expanded with usage, AI features, chunking, endpoints, and test instructions.
 - `Dockerfile` - multi-stage build for Python 3.13. Builds wheels in a builder stage and installs the wheel in the runtime image.
 - `.dockerignore` to exclude caches, venvs, and build artifacts.
