@@ -1,0 +1,17 @@
+name: Branch protection check
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  check-protection:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branch protection for main
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: 1
+          body: |
+            This repository should enable branch protection rules on `main`/`master` to require PR reviews and status checks (ruff, mypy, pytest). Please configure branch protection under Settings → Branches.
