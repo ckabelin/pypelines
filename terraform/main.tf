@@ -35,13 +35,13 @@ resource "github_branch_protection" "protect_main" {
   repository_id = data.github_repository.this.node_id
   pattern       = "main"
 
-  required_status_checks = {
+  required_status_checks {
     strict   = true
     contexts = ["checks"]
   }
 
   required_pull_request_reviews {
-    dismissal_restrictions = {}
+    dismissal_restrictions = []
     dismiss_stale_reviews   = true
     require_code_owner_reviews = false
     required_approving_review_count = 1
