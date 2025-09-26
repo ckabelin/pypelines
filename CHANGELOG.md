@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - Refactor: Move project layout to repository root (removed nested `test1/` folder). Workflows updated to run from repo root.
+- Removed: All GitHub Actions workflow files were removed from the repository. CI is no longer present by default. To re-enable CI, add workflows under `.github/workflows/` or configure CI centrally.
 - Feature: `uv` first — CLI extended with `lint`, `typecheck`, and improved `test` options. All CI lint/type/test steps now invoke `uv`.
 - Dev tooling: added `scripts/bootstrap.sh` and `Makefile` to standardize environment setup and common tasks.
 - Infrastructure: workflows and Terraform paths updated to refer to root `terraform/` directory.
