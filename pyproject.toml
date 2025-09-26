@@ -12,15 +12,16 @@ license = { text = "GPL" }
 requires-python = ">=3.11"
 
 dependencies = [
-  "fastapi>=0.95.0",
-  "uvicorn[standard]>=0.20.0",
-  "streamlit>=1.24",
-  "langchain>=0.0.297", # pin as appropriate for Ollama integration
-  "ollama>=0.1.0",      # Python client for Ollama if available
-  "sentence-transformers>=2.2.2",
-  "chromadb>=0.3.29",
-  "tiktoken>=0.4.0",
-  "typing-extensions",
+  "fastapi>=0.117.1",
+  "uvicorn[standard]>=0.37.0",
+  "streamlit>=1.50",
+  "langchain>=0.3.27",
+  "langchain-community>=0.3.27",
+  "ollama>=0.6.0",
+  "sentence-transformers>=5.1.1",
+  "chromadb>=1.1.0",
+  "tiktoken>=0.11.0",
+  "typing-extensions>=4.15.0",
 ]
 
 [project.optional-dependencies]

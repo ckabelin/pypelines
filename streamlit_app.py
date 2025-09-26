@@ -1,12 +1,20 @@
 import streamlit as st
 from typing import List
 import os
+import logging
 from concurrent.futures import ThreadPoolExecutor
 
 from pypelines.ai import ChromaVectorDB, OllamaWrapper
 
 
+LOGGER: logging.Logger = logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
+
+LOGGER.info("Starting Streamlit app...")
+
 STORAGE_DIR = "./chroma_store"
+
+MAX_WORKERS: int = 4
 
 st.set_page_config(page_title="pypelines AI Chat", layout="wide")
 st.title("pypelines — AI chat (Ollama + LangChain + Chroma)")
@@ -49,7 +57,7 @@ if "llm" not in st.session_state:
         st.error(f"LLM init failed: {e}")
         st.session_state.llm = None
 
-executor = ThreadPoolExecutor(max_workers=2)
+executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
 
 
 def _index_files(files, db: ChromaVectorDB):
@@ -99,3 +107,5 @@ if st.button("Send") and query:
 for q, a in st.session_state.history[::-1]:
     st.markdown(f"**User:** {q}")
     st.markdown(f"**Assistant:** {a}")
+
+LOGGER.info("Done ...")

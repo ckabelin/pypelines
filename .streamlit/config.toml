@@ -1,0 +1,11 @@
+[server]
+port = 9090
+headless = true
+enableCORS = false
+enableXsrfProtection=false
+
+[theme]
+primaryColor = "#23be0fff"
+backgroundColor = "#FFFFFF"
+textColor = "#000000ff"
+font = "sans-serif"

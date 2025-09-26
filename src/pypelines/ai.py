@@ -8,8 +8,8 @@ try:
     from langchain.schema import Document
     from langchain.text_splitter import CharacterTextSplitter
     from langchain.embeddings import HuggingFaceEmbeddings
-    from langchain.vectorstores import Chroma
-    from langchain.llms import Ollama
+    from langchain_community.vectorstores import Chroma
+    from langchain_community.llms import Ollama
     LANGCHAIN_AVAILABLE = True
 except Exception:
     LANGCHAIN_AVAILABLE = False

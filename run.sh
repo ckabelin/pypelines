@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-HOST="0.0.0.0"
-PORT="8080"
+HOST="localhost"
+PORT="9090"
 
-uv run streamlit_app.py $@ --server.port $PORT --server.address $HOST
+uv run python3 --version
+uv run python3 -m streamlit run streamlit_app.py --server.port $PORT --server.address $HOST $@ 
