@@ -1,3 +1,45 @@
+# Project Constitution — minimal requirements
+
+This repository follows a minimal layout and contract for a small Python service runnable with an ASGI server (uv/uvicorn) and managed with a `pyproject.toml`.
+
+Key points (current authoritative contract)
+
+- The project is rooted at the repository root (no nested `test1/` required).
+- Developer entrypoint is the `uv` console script (installed via `pip install -e '.[dev]'`). All linting, typechecking and tests should be invoked via `uv` (for example `uv lint`, `uv typecheck`, `uv test`).
+- A helper bootstrap script is provided: `./scripts/bootstrap.sh` (creates `.venv` and installs `.[dev]`). A `Makefile` also exposes common targets (`bootstrap`, `lint`, `typecheck`, `test`, `run`).
+- Heavy AI/ML dependencies are in an optional `ai` extra. Install them only when you need Streamlit/LLM features: `pip install -e '.[dev,ai]'`.
+
+Minimal layout
+
+- `pyproject.toml` — project metadata, dependencies and console scripts.
+- `src/pypelines/` — package sources.
+- `tests/` — test suite.
+- `.github/workflows/` — GitHub Actions workflows at repo root.
+- `terraform/` — terraform examples and optional GitHub provider hooks.
+- `scripts/bootstrap.sh` and `Makefile` — standardized developer setup and tasks.
+
+Entrypoints and running
+
+- Install (development):
+
+```bash
+./scripts/bootstrap.sh
+source .venv/bin/activate
+```
+
+- Common commands (via `uv`):
+
+```bash
+uv lint           # run ruff
+uv typecheck      # run mypy
+uv test           # run pytest
+uv run run        # run ASGI app via uvicorn
+```
+
+Governance
+
+1. CI and contributors must invoke lint/typecheck/tests via `uv` to guarantee consistent behavior.
+2. Keep `CONSTITUTION.md` and `pyproject.toml` in sync for declared dependencies and runtime contracts.
 ````markdown
 
 Project Constitution — minimal requirements

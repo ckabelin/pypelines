@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased]
+
+- Refactor: Move project layout to repository root (removed nested `test1/` folder). Workflows updated to run from repo root.
+- Feature: `uv` first — CLI extended with `lint`, `typecheck`, and improved `test` options. All CI lint/type/test steps now invoke `uv`.
+- Dev tooling: added `scripts/bootstrap.sh` and `Makefile` to standardize environment setup and common tasks.
+- Infrastructure: workflows and Terraform paths updated to refer to root `terraform/` directory.
+
+## [0.1.0] - 2024-06-01
+- Initial public release (placeholder).
+# Changelog
+
 All notable changes made in this branch / session.
 
 ## Unreleased
