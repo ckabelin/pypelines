@@ -15,11 +15,6 @@ dependencies = [
   "fastapi>=0.95.0",
   "uvicorn[standard]>=0.20.0",
   "streamlit>=1.24",
-  # heavy AI/ML dependencies moved to the `ai` optional extras to keep
-  # base installs small and CI jobs fast. See [project.optional-dependencies].ai
-]
-
-ai = [
   "langchain>=0.0.297", # pin as appropriate for Ollama integration
   "ollama>=0.1.0",      # Python client for Ollama if available
   "sentence-transformers>=2.2.2",

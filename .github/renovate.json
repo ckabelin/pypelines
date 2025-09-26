@@ -1,0 +1,23 @@
+{
+  "extends": ["config:base"],
+  "labels": ["dependencies", "renovate"],
+  "timezone": "UTC",
+  "schedule": ["before 3am on monday"],
+  "packageRules": [
+    {
+      "matchDepTypes": ["dependencies", "devDependencies"],
+      "matchPackageNames": ["python"],
+      "groupName": "python dependencies",
+      "groupSlug": "python-deps"
+    },
+    {
+      "matchDatasources": ["pip_requirements", "pip", "pypi"],
+      "groupName": "all pip dependencies",
+      "groupSlug": "pip-all",
+      "prPriority": 10
+    }
+  ],
+  "pip_requirements": {
+    "enabled": true
+  }
+}
