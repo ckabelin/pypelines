@@ -24,7 +24,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd test1
           python -m pip install --upgrade pip
           pip install -e '.[dev]'
 
@@ -32,7 +31,6 @@ jobs:
         id: ruff
         continue-on-error: true
         run: |
-          cd test1
           ruff check . || true
 
       - name: Report ruff via reviewdog
@@ -48,7 +46,6 @@ jobs:
         id: mypy
         continue-on-error: true
         run: |
-          cd test1
           mypy src tests || true
 
       - name: Report mypy via reviewdog
@@ -64,7 +61,6 @@ jobs:
         id: pytest
         continue-on-error: true
         run: |
-          cd test1
           pytest -q --junitxml=pytest-report.xml || true
 
       - name: Report pytest via reviewdog
@@ -80,8 +76,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pytest-report
-          path: test1/pytest-report.xml
+            name: pytest-report
+            path: pytest-report.xml
 
       - name: Upload CodeQL SARIF (if present)
         if: always()

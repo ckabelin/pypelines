@@ -34,7 +34,6 @@ jobs:
 
       - name: Autobuild (pip install)
         run: |
-          cd test1
           python -m pip install --upgrade pip
           pip install -e '.[dev]'
 

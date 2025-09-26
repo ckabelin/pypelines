@@ -27,19 +27,17 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('test1/**/pyproject.toml') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
       - name: Install dev dependencies
         run: |
-          cd test1
           python -m pip install --upgrade pip
           pip install -e '.[dev]'
 
       - name: Run ruff
         run: |
-          cd test1
           ruff check .
 
   typecheck:
@@ -58,19 +56,17 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('test1/**/pyproject.toml') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
       - name: Install dev dependencies
         run: |
-          cd test1
           python -m pip install --upgrade pip
           pip install -e '.[dev]'
 
       - name: Run mypy
         run: |
-          cd test1
           mypy src tests
 
   test:
@@ -89,19 +85,17 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('test1/**/pyproject.toml') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
       - name: Install dev dependencies
         run: |
-          cd test1
           python -m pip install --upgrade pip
           pip install -e '.[dev]'
 
       - name: Run tests
         run: |
-          cd test1
           pytest -q
 
   terraform:
@@ -116,6 +110,6 @@ jobs:
 
       - name: Terraform init & validate
         run: |
-          cd test1/terraform
+          cd terraform
           terraform init -input=false
           terraform validate
