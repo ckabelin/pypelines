@@ -28,6 +28,58 @@ Notes for maintainers:
 - The workflows now call `ruff`, `mypy`, and `pytest` directly instead of relying on the project's `uv` entrypoint. This makes them more robust on GitHub-hosted runners.
 - To reproduce CI locally, bootstrap the venv and install dev extras using `./scripts/bootstrap.sh` or `make bootstrap`, then run `ruff`, `mypy`, and `pytest`.
 
+Pre-commit hooks (ruff, mypy, pytest)
+
+This repository includes a `.pre-commit-config.yaml` that runs `ruff`, `mypy`, `pydocstyle` and a local `pytest` hook.
+
+Install and enable pre-commit hooks locally:
+
+```bash
+# bootstrap the developer environment
+./scripts/bootstrap.sh
+source .venv/bin/activate
+
+# install pre-commit if not already in your venv
+pip install pre-commit
+
+# install git hooks
+pre-commit install
+
+# run all hooks against the repo
+pre-commit run --all-files
+```
+
+The `pytest` hook runs the entire test suite and is configured as a local script at `scripts/pre-commit-pytest.sh`. If your environment cannot create a `.venv` automatically, ensure `pytest` is available on your PATH.
+
+Troubleshooting: system packages
+
+If `./scripts/bootstrap.sh` fails to create a venv or bootstrap pip, you may need to install system packages.
+
+Debian/Ubuntu:
+
+```bash
+sudo apt update
+sudo apt install python3-venv python3-pip
+```
+
+macOS (Homebrew):
+
+```bash
+brew install python
+```
+
+After installing system packages, re-run the bootstrap script:
+
+```bash
+./scripts/bootstrap.sh
+# or skip tests
+./scripts/bootstrap.sh --skip-tests
+# install AI extras too
+./scripts/bootstrap.sh --ai
+# only install pre-commit hooks (fast)
+./scripts/bootstrap.sh --precommit-only
+```
+
 
 2. Activate the venv:
 

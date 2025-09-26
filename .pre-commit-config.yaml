@@ -21,3 +21,13 @@ repos:
     hooks:
       - id: prettier
         files: "\.(md|pyproject\.toml|yaml|yml)$"
+
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: ./scripts/pre-commit-pytest.sh
+        language: script
+        pass_filenames: false
+        always_run: true
+        stages: [push]

@@ -1,0 +1,72 @@
+name: Build and Publish Docker
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*', 'release-*' ]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.set-tag.outputs.image_tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set image tag
+        id: set-tag
+        run: |
+          echo "image_tag=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Build Docker image
+        run: |
+          IMAGE_TAG=${{ steps.set-tag.outputs.image_tag }}
+          docker build -t pypelines:${IMAGE_TAG} .
+          docker save pypelines:${IMAGE_TAG} -o image.tar
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-tar
+          path: image.tar
+
+  publish:
+    needs: build-image
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image-tar
+
+      - name: Load Docker image
+        run: docker load -i image.tar
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag and push
+        run: |
+          IMAGE_TAG=${{ needs.build-image.outputs.image_tag }}
+          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/pypelines
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            docker tag pypelines:${IMAGE_TAG} ${IMAGE_NAME}:${IMAGE_TAG}
+            docker push ${IMAGE_NAME}:${IMAGE_TAG}
+          else
+            GIT_TAG=${{ github.ref_name }}
+            docker tag pypelines:${IMAGE_TAG} ${IMAGE_NAME}:${GIT_TAG}
+            docker tag pypelines:${IMAGE_TAG} ${IMAGE_NAME}:latest
+            docker push ${IMAGE_NAME}:${GIT_TAG}
+            docker push ${IMAGE_NAME}:latest
+          fi
