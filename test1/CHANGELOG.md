@@ -50,19 +50,63 @@ All notable changes made in this branch / session.
 
 ### CI updates
 - Added an `ai-tests` job to CI that installs `.[dev,ai]` and runs the AI test suite. This job is heavy and runs manually (workflow_dispatch) or on pushes to `main` to avoid slowing PR feedback.
+# Changelog
+
+All notable changes made in this branch / session.
+
+## Unreleased
+
+### Summary
+- Moved GitHub workflows from `test1/.github/workflows/` to repository root `.github/workflows/` and fixed CodeQL SARIF handling to avoid workflow-time errors when no SARIF is produced.
+- Packaged heavy AI/ML libraries into an optional `ai` extra; `streamlit` remains runtime. Removed `reviewdog` from Python `dev` extras (CI still uses reviewdog Actions).
+- Added an optional `ai-tests` CI job that installs `.[dev,ai]` and runs AI-specific tests. This job is manual/optional to keep PR feedback fast.
+- Terraform examples updated to include an optional GitHub provider and a `github_branch_protection` skeleton (requires admin token to apply).
+
+### Details
+
+### Added
+- `pyproject.toml` updates
+  - Project metadata and runtime dependencies (FastAPI, Uvicorn, Streamlit).
+  - `[project.scripts]` entry: `uv = "pypelines.cli:main"` (console script).
+  - Optional `ai` extra for heavy AI dependencies (LangChain, Chroma, sentence-transformers, tiktoken, Ollama client).
+  - `[tool.ruff]` and `[tool.pydocstyle]` config.
+- `CONSTITUTION.md` updated to reflect the current project layout, CLI, AI features, and lint/typecheck config.
+- `README.md` expanded with usage, AI features, chunking, endpoints, and test instructions.
+- `Dockerfile` - multi-stage build for Python 3.13. Builds wheels in a builder stage and installs the wheel in the runtime image.
+- `.dockerignore` to exclude caches, venvs, and build artifacts.
+- Terraform configuration under `terraform/` to build the Docker image using the `kreuzwerker/docker` provider: `terraform/main.tf`, `terraform/variables.tf`, `terraform/README.md`.
+- GitHub Actions workflow: `.github/workflows/build-and-publish.yml` that builds Docker images on push and supports manual publish and tag-triggered publish to GHCR.
+- Pre-commit config `.pre-commit-config.yaml` with hooks for ruff, mypy and pydocstyle.
+- `mypy.ini` updated to strict mode; `mypy` hook configured to use the project's config.
+
+### AI & App features
+- `src/pypelines/ai.py` — Chroma-backed vector store and Ollama wrapper.
+- `streamlit_app.py` — Streamlit chat UI with chunking and background indexing.
+- `src/pypelines/main.py` — FastAPI app enhancements (vector and chat endpoints).
+- `src/pypelines/cli.py` — CLI `uv` extended with `uv test` to run pytest.
+- Tests: `tests/test_ai.py` added (skips when langchain/chromadb not installed).
+
+### CI / Dev tooling
+- `README.md` updated with developer usage and testing instructions.
+- `.pre-commit-config.yaml` includes pydocstyle to enforce Google docstring style.
+
+### Build / CI adjustments
+- CI jobs updated to operate from the repository root and `cd` into `test1` for project-level commands where needed.
+- Added a `terraform` job which runs `terraform init` and `terraform validate` inside `test1/terraform` (note: terraform CLI must be available in the runner).
+
+### Dependency changes
+- Moved heavy AI dependencies to the optional `ai` extra to avoid slowing base installs and CI; `streamlit` remains a runtime dependency.
+- Relaxed `requires-python` to `>=3.11` for compatibility.
+
+### CI updates
+- Added an `ai-tests` job to CI that installs `.[dev,ai]` and runs the AI test suite as a manual/optional job to avoid slowing PR feedback.
 
 ### Security / Code scanning
-- Added CodeQL workflow (`.github/workflows/codeql.yml`) to run weekly and on PRs/pushes targeting `main`/`master`. CodeQL exports SARIF results and uploads them as artifacts; if findings are detected, a GitHub issue is created to track the findings.
-- Integrated `reviewdog` into the auto code review workflow to annotate PR diffs with `ruff`, `mypy`, and `pytest` feedback (GitHub PR review comments). This improves in-PR feedback visibility for style, type, and test issues.
-
-Note: `reviewdog` was intentionally removed from the Python `dev` extras to avoid local install resolution issues; CI uses the `reviewdog` GitHub Actions which do not require the Python package to be installed.
+- Added CodeQL workflow `.github/workflows/codeql.yml` to run on PRs and scheduled intervals. SARIF results are uploaded and an issue is created only when findings are present.
+- Reviewdog remains used in CI via the reviewdog Actions; the Python package was removed from the `dev` extras to avoid local resolution issues.
 
 ### Terraform / Branch protection
-- Extended Terraform in `terraform/main.tf` to optionally manage branch protection for `main` via the GitHub provider (`github_branch_protection`). This requires supplying `github_owner`, `github_repo` variables and a token with admin permissions to apply. The resource enforces required status checks and PR review requirements.
-
-### Logging & Review
-- Auto code review workflow now uploads SARIF and pytest artifacts and posts a short summary comment on PRs. CodeQL SARIF artifacts are uploaded for offline review and security logging.
-
+- Extended Terraform to optionally manage branch protection for `main` via the GitHub provider (`github_branch_protection`). Applying requires a token with admin permissions.
 
 ### Notes
 - Vector DB persistence uses Chroma and persists to `CHROMA_PERSIST_DIR` or `./chroma_store`.
@@ -73,7 +117,7 @@ Note: `reviewdog` was intentionally removed from the Python `dev` extras to avoi
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -e '.[dev,ai]'
+pip install -e '.[dev]'
 ```
 - Run Streamlit UI:
 ```bash
@@ -89,7 +133,6 @@ uvicorn pypelines.main:app --reload
 ```bash
 uv test
 ```
-
 ---
 
 > This changelog was generated automatically summarizing modifications made in the current session. Review entries before releasing.
