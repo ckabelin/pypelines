@@ -9,6 +9,7 @@ on:
     branches: ['**']
   pull_request:
     branches: ['**']
+  workflow_dispatch: {}
 
 jobs:
   lint:
@@ -119,3 +120,36 @@ jobs:
           cd test1/terraform
           terraform init -input=false
           terraform validate
+
+  ai-tests:
+    name: AI tests (optional, heavy)
+    runs-on: ubuntu-latest
+    # Run only manually or on pushes to main to avoid slowing PRs by default
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('test1/**/pyproject.toml') }}-ai
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dev + ai extras (heavy)
+        run: |
+          cd test1
+          python -m pip install --upgrade pip
+          pip install -e '.[dev,ai]'
+
+      - name: Run AI tests
+        run: |
+          cd test1
+          pytest -q tests/test_ai.py

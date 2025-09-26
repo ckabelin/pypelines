@@ -48,6 +48,9 @@ All notable changes made in this branch / session.
 - Moved heavy AI dependencies (langchain, chromadb, sentence-transformers, tiktoken, ollama) from runtime `dependencies` into the optional `ai` extras to avoid slowing base installs and CI. `streamlit` remains a runtime dependency to support the UI.
 - Relaxed `requires-python` to `>=3.11` for broader compatibility across CI runners.
 
+### CI updates
+- Added an `ai-tests` job to CI that installs `.[dev,ai]` and runs the AI test suite. This job is heavy and runs manually (workflow_dispatch) or on pushes to `main` to avoid slowing PR feedback.
+
 ### Security / Code scanning
 - Added CodeQL workflow (`.github/workflows/codeql.yml`) to run weekly and on PRs/pushes targeting `main`/`master`. CodeQL exports SARIF results and uploads them as artifacts; if findings are detected, a GitHub issue is created to track the findings.
 - Integrated `reviewdog` into the auto code review workflow to annotate PR diffs with `ruff`, `mypy`, and `pytest` feedback (GitHub PR review comments). This improves in-PR feedback visibility for style, type, and test issues.
