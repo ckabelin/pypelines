@@ -1,27 +1,42 @@
 repos:
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.256
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
     hooks:
-      - id: ruff
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-illegal-windows-names
+      - id: check-json
+      - id: check-shebang-scripts-are-executable
+      - id: check-yaml
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args:
+          - --fix=lf
+      - id: pretty-format-json
+        args:
+          - --autofix
+          - --no-sort-keys
+      - id: trailing-whitespace
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.13.0
+    hooks:
+      - id: ruff-check
         args: ["--fix"]
+      - id: ruff-format
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.9.0
+    rev: v1.17.1
     hooks:
       - id: mypy
-        additional_dependencies: ["mypy==1.9"]
-        args: ["--config-file", "mypy.ini"]
-  - repo: https://github.com/PyCQA/pydocstyle
-    rev: 6.3.0
-    hooks:
-      - id: pydocstyle
-        additional_dependencies: ["pydocstyle==6.3.0"]
-        args: ["--convention=google"]
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.4.1
-    hooks:
-      - id: prettier
-        files: "\.(md|pyproject\.toml|yaml|yml)$"
-
+        args:
+          - --explicit-package-bases
+          - --ignore-missing-imports
+          - --follow-untyped-imports
+          - --check-untyped-defs
+        additional_dependencies:
+          - types-requests
+          - types-pytz
   - repo: local
     hooks:
       - id: pytest
