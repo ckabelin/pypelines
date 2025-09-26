@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import json
 from typing import Dict, List, Optional, cast
 
@@ -13,6 +14,11 @@ try:
     LANGCHAIN_AVAILABLE = True
 except Exception:
     LANGCHAIN_AVAILABLE = False
+
+DEFAULT_MODEL: str = os.getenv("LLM_MODEL_CONV", "llama2")
+DEFAULT_MODEL_EMB: str = os.getenv(
+    "LLM_MODEL_EMB", "all-MiniLM-L6-v2"
+)  # "sentence-transformers/all-MiniLM-L6-v2"
 
 
 class ChromaVectorDB:
@@ -28,7 +34,7 @@ class ChromaVectorDB:
 
     def __init__(
         self,
-        embedding_model: str = "all-MiniLM-L6-v2",
+        embedding_model: str = DEFAULT_MODEL_EMB,
         persist_directory: Optional[str] = None,
         collection_name: str = "pypelines",
     ):
@@ -101,7 +107,7 @@ class ChromaVectorDB:
 
 
 class OllamaWrapper:
-    def __init__(self, model: str = "llama2", server_url: Optional[str] = None):
+    def __init__(self, model: str = DEFAULT_MODEL, server_url: Optional[str] = None):
         if not LANGCHAIN_AVAILABLE:
             raise RuntimeError(
                 "LangChain or Ollama client not available; install the 'ai' extra."
