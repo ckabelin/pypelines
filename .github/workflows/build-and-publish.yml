@@ -21,8 +21,8 @@ jobs:
       - name: Build Docker image
         run: |
           IMAGE_TAG=${{ github.sha }}
-          # build using the test1 subdirectory as context
-          docker build -t pypelines:${IMAGE_TAG} test1
+          # build from repository root (Dockerfile in repo root)
+          docker build -t pypelines:${IMAGE_TAG} .
           docker save pypelines:${IMAGE_TAG} -o image.tar
 
       - name: Upload image artifact
@@ -99,4 +99,4 @@ jobs:
           docker push ${IMAGE_NAME}:latest
 
       - name: Publish summary
-        run: echo "Pushed image ghcr.io/${{ github.repository_owner }}/pypelines:${{ github.ref_name }} and :latest"
+        run: echo "Pushed image ${IMAGE_NAME}:${GIT_TAG} and :latest"
