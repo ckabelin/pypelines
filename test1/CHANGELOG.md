@@ -48,6 +48,8 @@ All notable changes made in this branch / session.
 - Added CodeQL workflow (`.github/workflows/codeql.yml`) to run weekly and on PRs/pushes targeting `main`/`master`. CodeQL exports SARIF results and uploads them as artifacts; if findings are detected, a GitHub issue is created to track the findings.
 - Integrated `reviewdog` into the auto code review workflow to annotate PR diffs with `ruff`, `mypy`, and `pytest` feedback (GitHub PR review comments). This improves in-PR feedback visibility for style, type, and test issues.
 
+Note: `reviewdog` was intentionally removed from the Python `dev` extras to avoid local install resolution issues; CI uses the `reviewdog` GitHub Actions which do not require the Python package to be installed.
+
 ### Terraform / Branch protection
 - Extended Terraform in `terraform/main.tf` to optionally manage branch protection for `main` via the GitHub provider (`github_branch_protection`). This requires supplying `github_owner`, `github_repo` variables and a token with admin permissions to apply. The resource enforces required status checks and PR review requirements.
 

@@ -29,6 +29,27 @@ Or use uvicorn directly when `src` is on `PYTHONPATH` or the package is installe
 uvicorn pypelines.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
+## Install and run (`uv` and `uvx`)
+
+After installing the package, you get a small CLI wrapper `uv` that exposes convenient subcommands. `uvx` below refers to running uvicorn directly.
+
+Install (editable) and run the CLI:
+
+```bash
+pip install -e .
+# start the server using the uv CLI (wrapper around uvicorn)
+uv run run --host 0.0.0.0 --port 8000 --reload
+```
+
+Run the app directly with uvicorn (referred here as `uvx`):
+
+```bash
+uvx() { uvicorn "$@"; }
+# example usage:
+uvx pypelines.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+
 ## Tests
 
 Run tests with pytest:
