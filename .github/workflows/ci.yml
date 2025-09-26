@@ -48,7 +48,7 @@ jobs:
 
       - name: Run pytest
         run: |
-          pytest -q
+          pytest --junitxml=pytest.junit.xml
 
   terraform:
     name: Terraform validate
