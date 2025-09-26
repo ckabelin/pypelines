@@ -19,6 +19,13 @@ def build_parser() -> argparse.ArgumentParser:
     
     test = sub.add_parser("test", help="Run test suite")
     test.add_argument("-q", "--quiet", action="store_true", help="Run pytest quietly")
+    test.add_argument("--junitxml", help="Write junit-xml to the given path (passed to pytest)")
+
+    lint = sub.add_parser("lint", help="Run ruff linter")
+    lint.add_argument("--fix", action="store_true", help="Run ruff --fix")
+
+    typecheck = sub.add_parser("typecheck", help="Run mypy type checker")
+    typecheck.add_argument("--strict", action="store_true", help="Run mypy in strict mode (if configured)")
 
     return parser
 
@@ -54,7 +61,35 @@ def main(argv: List[str] | None = None) -> int:
         opts = []
         if args.quiet:
             opts.append("-q")
+        if args.junitxml:
+            opts.append(f"--junitxml={args.junitxml}")
         return pytest.main(opts)
+
+    if args.cmd == "lint":
+        # run ruff as a subprocess so it behaves like the CLI tool
+        import shutil
+        import subprocess
+        ruff = shutil.which("ruff")
+        if not ruff:
+            print("ruff not found in PATH; ensure dev extras are installed", file=sys.stderr)
+            return 2
+        cmd = [ruff, "check", "."]
+        if args.fix:
+            cmd = [ruff, "check", ".", "--fix"]
+        return subprocess.call(cmd)
+
+    if args.cmd == "typecheck":
+        import shutil
+        import subprocess
+        mypy = shutil.which("mypy")
+        if not mypy:
+            print("mypy not found in PATH; ensure dev extras are installed", file=sys.stderr)
+            return 2
+        cmd = [mypy, "src", "tests"]
+        # `--strict` is usually configured in mypy.ini; pass-through if requested
+        if args.strict:
+            cmd.append("--strict")
+        return subprocess.call(cmd)
 
     parser.print_help()
     return 1

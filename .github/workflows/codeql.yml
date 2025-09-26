@@ -34,7 +34,6 @@ jobs:
 
       - name: Autobuild (pip install)
         run: |
-          cd test1
           python -m pip install --upgrade pip
           pip install -e '.[dev]'
 
@@ -50,12 +49,23 @@ jobs:
           name: codeql-sarif
           path: codeql-results.sarif
 
-      - name: Create issue if CodeQL findings
-        if: always() && steps.analyze.conclusion == 'failure'
+      - name: Create issue if CodeQL SARIF looks non-empty
+        if: always()
         uses: actions/github-script@v7
         with:
           script: |
-            const body = `CodeQL found potential security issues. SARIF results are attached as an artifact. Please review the CodeQL alerts in the Security tab.`;
+            const fs = require('fs');
+            const path = 'codeql-results.sarif';
+            if (!fs.existsSync(path)) {
+              core.info('No SARIF file produced, skipping issue creation.');
+              return;
+            }
+            const stat = fs.statSync(path);
+            if (stat.size === 0) {
+              core.info('SARIF file is empty, skipping issue creation.');
+              return;
+            }
+            const body = `CodeQL produced a SARIF report (attached artifact). Please review the Security tab for alerts.`;
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,

@@ -9,6 +9,10 @@ on:
 jobs:
   checks:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -20,16 +24,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd test1
           python -m pip install --upgrade pip
           pip install -e '.[dev]'
 
-      - name: Run ruff
+      - name: Run lint via uv
         id: ruff
         continue-on-error: true
         run: |
-          cd test1
-          ruff check . || true
+          uv lint --fix || true
 
       - name: Report ruff via reviewdog
         if: github.event_name == 'pull_request'
@@ -40,12 +42,11 @@ jobs:
           level: warning
           filter_mode: added
 
-      - name: Run mypy
+      - name: Run typecheck via uv
         id: mypy
         continue-on-error: true
         run: |
-          cd test1
-          mypy src tests || true
+          uv typecheck || true
 
       - name: Report mypy via reviewdog
         if: github.event_name == 'pull_request'
@@ -56,12 +57,11 @@ jobs:
           level: warning
           filter_mode: added
 
-      - name: Run pytest (junit xml)
+      - name: Run pytest (junit xml) via uv
         id: pytest
         continue-on-error: true
         run: |
-          cd test1
-          pytest -q --junitxml=pytest-report.xml || true
+          uv test --junitxml=pytest-report.xml || true
 
       - name: Report pytest via reviewdog
         if: github.event_name == 'pull_request'
@@ -76,8 +76,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pytest-report
-          path: test1/pytest-report.xml
+            name: pytest-report
+            path: pytest-report.xml
 
       - name: Upload CodeQL SARIF (if present)
         if: always()
