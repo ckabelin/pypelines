@@ -1,11 +1,13 @@
-import streamlit as st
-from typing import List
-import os
+"""DDD."""
+
 import logging
+import os
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any, List
+
+import streamlit as st
 
 from pypelines.ai import ChromaVectorDB, OllamaWrapper
-
 
 LOGGER: logging.Logger = logging.getLogger(__name__)
 LOGGER.setLevel(logging.DEBUG)
@@ -16,24 +18,32 @@ STORAGE_DIR = "./chroma_store"
 
 MAX_WORKERS: int = 4
 
-st.set_page_config(page_title="pypelines AI Chat", layout="wide")
-st.title("pypelines — AI chat (Ollama + LangChain + Chroma)")
+st.set_page_config(page_title="Quazzel", layout="wide")
+st.title("Quazzel")
 
 
-def _init_db(persist_dir: str, chunk_size: int, chunk_overlap: int):
+def _init_db(persist_dir: str, chunk_size: int, chunk_overlap: int) -> ChromaVectorDB:
     """Initialize the ChromaVectorDB with given chunking params."""
-    db = ChromaVectorDB(persist_directory=persist_dir)
+    db: ChromaVectorDB = ChromaVectorDB(persist_directory=persist_dir)
     # override splitter if needed
-    db.text_splitter = db.text_splitter.__class__(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+    db.text_splitter = db.text_splitter.__class__(
+        chunk_size=chunk_size, chunk_overlap=chunk_overlap
+    )
     return db
 
 
 # Sidebar: settings
 with st.sidebar:
     st.header("Context & Documents")
-    chunk_size = st.number_input("Chunk size", value=1000, min_value=128, max_value=5000, step=128)
-    chunk_overlap = st.number_input("Chunk overlap", value=200, min_value=0, max_value=1000, step=50)
-    upload = st.file_uploader("Upload text files to inject into the vector DB", accept_multiple_files=True)
+    chunk_size = st.number_input(
+        "Chunk size", value=1000, min_value=128, max_value=5000, step=128
+    )
+    chunk_overlap = st.number_input(
+        "Chunk overlap", value=200, min_value=0, max_value=1000, step=50
+    )
+    upload = st.file_uploader(
+        "Upload text files to inject into the vector DB", accept_multiple_files=True
+    )
     if st.button("Clear persisted context"):
         if os.path.exists(STORAGE_DIR):
             import shutil
@@ -60,9 +70,10 @@ if "llm" not in st.session_state:
 executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
 
 
-def _index_files(files, db: ChromaVectorDB):
-    texts = []
+def _index_files(files: List[Any], db: ChromaVectorDB) -> int:
+    texts: list[str] = []
     for f in files:
+        t: str
         try:
             t = f.getvalue().decode("utf-8")
         except Exception:
@@ -90,11 +101,15 @@ if st.button("Send") and query:
     llm = st.session_state.llm
     context = db.similarity_search(query) if db is not None else []
     context_text = "\n\n".join([d.page_content for d in context])
-    prompt = (
-        f"Use the following context to answer the question:\n{context_text}\n\nUser: {query}\nAssistant:"
-        if context_text
-        else f"User: {query}\nAssistant:"
-    )
+    prompt: str
+    if context_text:
+        prompt = (
+            "Use the following context to answer the question:\n"
+            + f"{context_text}\n\n"
+            + f"User: {query}\nAssistant:"
+        )
+    else:
+        prompt = f"User: {query}\nAssistant:"
 
     if llm is not None:
         with st.spinner("Generating..."):

@@ -17,6 +17,7 @@ dependencies = [
   "streamlit>=1.50",
   "langchain>=0.3.27",
   "langchain-community>=0.3.27",
+  "langchain-huggingface>=0.3.1",
   "ollama>=0.6.0",
   "sentence-transformers>=5.1.1",
   "chromadb>=1.1.0",
@@ -39,12 +40,6 @@ dev = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-
-[tool.ruff]
-# minimal ruff configuration
-line-length = 88
-select = ["E", "F", "W", "I", "C", "T", "D"]
-extend-ignore = ["E203"]
 
 [tool.pydocstyle]
 # Use Google style docstrings
