@@ -36,9 +36,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e '.[dev]'
 
-      - name: Run ruff
+      - name: Run lint (via uv)
         run: |
-          ruff check .
+          uv lint --fix
 
   typecheck:
     name: Mypy Typecheck
@@ -65,9 +65,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e '.[dev]'
 
-      - name: Run mypy
+      - name: Run typecheck (via uv)
         run: |
-          mypy src tests
+          uv typecheck
 
   test:
     name: Pytest
@@ -94,9 +94,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e '.[dev]'
 
-      - name: Run tests
+      - name: Run tests (via uv)
         run: |
-          pytest -q
+          uv test
 
   terraform:
     name: Terraform validate
