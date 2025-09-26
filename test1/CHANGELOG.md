@@ -44,6 +44,10 @@ All notable changes made in this branch / session.
 
 - CI updated to run from the repository root and `cd` into `test1` for project-level commands. Added a `terraform` job which runs `terraform init` and `terraform validate` inside `test1/terraform`.
 
+### Dependency changes
+- Moved heavy AI dependencies (langchain, chromadb, sentence-transformers, tiktoken, ollama) from runtime `dependencies` into the optional `ai` extras to avoid slowing base installs and CI. `streamlit` remains a runtime dependency to support the UI.
+- Relaxed `requires-python` to `>=3.11` for broader compatibility across CI runners.
+
 ### Security / Code scanning
 - Added CodeQL workflow (`.github/workflows/codeql.yml`) to run weekly and on PRs/pushes targeting `main`/`master`. CodeQL exports SARIF results and uploads them as artifacts; if findings are detected, a GitHub issue is created to track the findings.
 - Integrated `reviewdog` into the auto code review workflow to annotate PR diffs with `ruff`, `mypy`, and `pytest` feedback (GitHub PR review comments). This improves in-PR feedback visibility for style, type, and test issues.
